@@ -12,7 +12,6 @@ public static class ApplicationDependencyInjection
     {
         services.AddScoped<INotificationStrategy, FallbackNotificationStrategy>();
         services.AddScoped<INotificationAggregator, NotificationAggregator>();
-
         
         return services;
     }

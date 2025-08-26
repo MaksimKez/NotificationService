@@ -11,5 +11,6 @@ public class ListingDto
     public bool PetsAllowed { get; set; }
     public bool HasBalcony { get; set; }
     public bool HasAppliances { get; set; }
+    public string Url { get; set; }
     public DateTime CreatedAt { get; set; }
 }
