@@ -5,5 +5,5 @@ namespace Infrastructure.EmailNotifier.Interfaces;
 
 public interface IEmailSender
 {
-    Task<Result> SendEmailAsync(JObject email);
+    Task<Result> SendEmailAsync(JObject email, CancellationToken cancellationToken = default);
 }

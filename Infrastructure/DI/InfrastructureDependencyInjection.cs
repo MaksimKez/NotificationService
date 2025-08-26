@@ -5,7 +5,6 @@ using Infrastructure.EmailNotifier.EmailBuilder.Interfaces;
 using Infrastructure.EmailNotifier.Interfaces;
 using Infrastructure.EmailNotifier.Models;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace Infrastructure.DI;
 
