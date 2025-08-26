@@ -1,8 +1,11 @@
-using Infrastructure.EmailNotifier.Models;
+using Application.DI;
+using Infrastructure.DI;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
-
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure();
 
 builder.Services.AddControllers();
 
