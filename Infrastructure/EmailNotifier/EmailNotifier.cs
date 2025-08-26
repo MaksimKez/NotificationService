@@ -2,32 +2,45 @@ using Application.Abstractions;
 using Application.Dtos;
 using Application.Results;
 using Infrastructure.EmailNotifier.EmailBuilder.Interfaces;
-using Infrastructure.EmailNotifier.Models;
+using Infrastructure.EmailNotifier.Interfaces;
 
 namespace Infrastructure.EmailNotifier;
 
-public class EmailNotifier(IEmailMessageBuilder messageBuilder) : INotifier
+public class EmailNotifier
+    (IEmailMessageBuilder messageBuilder, 
+     IEmailSender sender) 
+    : INotifier
 {
     public string Name { get; } = "EmailNotifier";
     public int Priority { get; } = 2;
-    public Task<Result> NotifySingle(UserListingPairDto userListingPair)
+    public async Task<Result> NotifySingle(UserListingPairDto userListingPair)
     {
         var emailMessage = messageBuilder.BuildDefault(userListingPair.Listing, userListingPair.User.Email
                                                                                 ?? throw new ArgumentException());
-        //todo send email
-
-        throw new NotImplementedException();
+        var result = await sender.SendEmailAsync(emailMessage);
+        return !result.IsSuccess
+            ? result 
+            : Result.Success();
     }
 
-    public Task<Result> NotifyMultiple(UserListingPairDto[] userListingPairs)
+    public async Task<ResultWithClass<Dictionary<Guid, string>>> NotifyMultiple(UserListingPairDto[] userListingPairs)
     {
+        var unnotifiedUsersWithErrors = new Dictionary<Guid, string>();
+        
         foreach (var userListingPair in userListingPairs)
         {
             var emailMessage = messageBuilder.BuildDefault(userListingPair.Listing, userListingPair.User.Email
                 ?? throw new ArgumentException());
 
-            //todo send email
+            var result = await sender.SendEmailAsync(emailMessage);
+            if (!result.IsSuccess)
+            {
+                unnotifiedUsersWithErrors.Add(userListingPair.User.Id, result.Error);
+            }
         }
-        throw new NotImplementedException();
+
+        return unnotifiedUsersWithErrors.Count != 0 
+            ? ResultWithClass<Dictionary<Guid, string>>.PartialFailure(unnotifiedUsersWithErrors)
+            : ResultWithClass<Dictionary<Guid, string>>.Success(new Dictionary<Guid, string>());
     }
 }
