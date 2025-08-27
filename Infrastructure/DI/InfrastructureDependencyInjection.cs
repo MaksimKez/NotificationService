@@ -16,10 +16,6 @@ public static class InfrastructureDependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
-        services.AddOptions<EmailSettings>(EmailSettings.DefaultConfigName);
-        services.AddOptions<RetryPolicySettings>(RetryPolicySettings.DefaultConfigName);
-        services.AddOptions<EmailSettings>(EmailSettings.DefaultConfigName);
-        
         services.AddScoped<IEmailMessageBuilder, EmailBuilder>();
         
         services.AddSingleton<IMailjetClient>(sp =>
