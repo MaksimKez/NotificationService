@@ -6,7 +6,7 @@ using Infrastructure.EmailNotifier.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection(EmailSettings.DefaultConfigName));
-builder.Services.Configure<RetryPolicySettings>(builder.Configuration.GetSection(EmailSettings.DefaultConfigName));
+builder.Services.Configure<RetryPolicySettings>(builder.Configuration.GetSection(RetryPolicySettings.DefaultConfigName));
 builder.Services.Configure<MailjetSettings>(builder.Configuration.GetSection(MailjetSettings.DefaultConfigName));
 
 builder.Services.AddApplication();

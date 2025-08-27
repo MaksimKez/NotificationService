@@ -6,25 +6,31 @@ using Newtonsoft.Json.Linq;
 
 namespace Infrastructure.EmailNotifier.EmailBuilder;
 
-public class EmailBuilder(IOptions<EmailSettings> defaultSettings) : IEmailMessageBuilder
+public class EmailBuilder : IEmailMessageBuilder
 {
-    private readonly EmailSettings _settings = defaultSettings.Value;
+    private readonly EmailSettings _settings;
 
     private EmailInfo _emailInfo = new();
     private ListingDto? _listing;
+
+    public EmailBuilder(IOptions<EmailSettings> defaultSettings)
+    {
+        _settings = defaultSettings.Value;
+    }
 
     private class EmailInfo
     {
         public string Subject { get; set; } = "Notification";
         public string To { get; set; } = string.Empty;
         public string Body { get; set; } = "New listing matching your filters";
+        public string FromEmail { get; set; } = string.Empty;
+        public string FromName { get; set; } = string.Empty;
     }
 
     public IEmailMessageBuilder FromTo(string from, string fromName, string to)
     {
-        _settings.FromEmail = from;
-        _settings.FromName = fromName;
-        
+        _emailInfo.FromEmail = from;
+        _emailInfo.FromName = fromName;
         _emailInfo.To = to;
         return this;
     }
@@ -49,35 +55,40 @@ public class EmailBuilder(IOptions<EmailSettings> defaultSettings) : IEmailMessa
 
     public JObject Build()
     {
-        var message = new JObject
-        {
-            ["From"] = new JObject
-            {
-                ["Email"] = _settings.FromEmail,
-                ["Name"] = _settings.FromName
-            },
-            ["To"] = new JArray
-            {
-                new JObject
-                {
-                    ["Email"] = _emailInfo.To
-                }
-            },
-            ["Subject"] = _emailInfo.Subject,
-            ["TextPart"] = _emailInfo.Body
-            // ["HTMLPart"] = BuildHtmlBody()
-        };
+        var fromEmail = !string.IsNullOrEmpty(_emailInfo.FromEmail) ? _emailInfo.FromEmail : _settings.FromEmail;
+        var fromName = !string.IsNullOrEmpty(_emailInfo.FromName) ? _emailInfo.FromName : _settings.FromName;
+
 
         return new JObject
         {
-            ["Messages"] = new JArray { message }
+            ["Messages"] = new JArray
+            {
+                new JObject
+                {
+                    ["From"] = new JObject
+                    {
+                        ["Email"] = _settings.FromEmail,
+                        ["Name"] = _settings.FromName
+                    },
+                    ["To"] = new JArray
+                    {
+                        new JObject
+                        {
+                            ["Email"] = _emailInfo.To,
+                            ["Name"] = "User"
+                        }
+                    },
+                    
+                    ["Subject"] = _emailInfo.Subject,
+                    ["TextPart"] = _emailInfo.Body + "\n" + _listing!.Url,
+                }
+            }
         };
     }
 
     public JObject BuildDefault(ListingDto listing, string toEmail)
     {
-        return new EmailBuilder(Options.Create(_settings))
-            .FromTo(_settings.FromEmail, _settings.FromName, toEmail)
+        return FromTo(_settings.FromEmail, _settings.FromName, toEmail)
             .WithSubject("New listing for you")
             .WithMessage("A new listing matches your filters")
             .WithListing(listing)

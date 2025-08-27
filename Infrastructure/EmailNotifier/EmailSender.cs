@@ -31,6 +31,11 @@ public class EmailSender : IEmailSender
             }.Property(Send.Messages, email["Messages"]);
 
             var response = await _mailjetClient.PostAsync(request);
+            
+            Console.WriteLine($"StatusCode: {response.StatusCode}\n");
+            Console.WriteLine($"ErrorInfo: {response.GetErrorInfo()}\n");
+            Console.WriteLine(response.GetData());
+            Console.WriteLine($"ErrorMessage: {response.GetErrorMessage()}\n");
 
             return response.IsSuccessStatusCode
                 ? Result.Success()
