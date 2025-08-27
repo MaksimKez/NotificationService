@@ -10,8 +10,8 @@ public class EmailBuilder : IEmailMessageBuilder
 {
     private readonly EmailSettings _settings;
 
-    private EmailInfo _emailInfo = new();
-    private ListingDto? _listing;
+    private EmailInfo emailInfo = new();
+    private ListingDto? listing;
 
     public EmailBuilder(IOptions<EmailSettings> defaultSettings)
     {
@@ -29,34 +29,34 @@ public class EmailBuilder : IEmailMessageBuilder
 
     public IEmailMessageBuilder FromTo(string from, string fromName, string to)
     {
-        _emailInfo.FromEmail = from;
-        _emailInfo.FromName = fromName;
-        _emailInfo.To = to;
+        emailInfo.FromEmail = from;
+        emailInfo.FromName = fromName;
+        emailInfo.To = to;
         return this;
     }
 
     public IEmailMessageBuilder WithSubject(string subject)
     {
-        _emailInfo.Subject = subject;
+        emailInfo.Subject = subject;
         return this;
     }
 
     public IEmailMessageBuilder WithMessage(string body)
     {
-        _emailInfo.Body = body;
+        emailInfo.Body = body;
         return this;
     }
 
     public IEmailMessageBuilder WithListing(ListingDto listing)
     {
-        _listing = listing;
+        this.listing = listing;
         return this;
     }
 
     public JObject Build()
     {
-        var fromEmail = !string.IsNullOrEmpty(_emailInfo.FromEmail) ? _emailInfo.FromEmail : _settings.FromEmail;
-        var fromName = !string.IsNullOrEmpty(_emailInfo.FromName) ? _emailInfo.FromName : _settings.FromName;
+        var fromEmail = !string.IsNullOrEmpty(emailInfo.FromEmail) ? emailInfo.FromEmail : _settings.FromEmail;
+        var fromName = !string.IsNullOrEmpty(emailInfo.FromName) ? emailInfo.FromName : _settings.FromName;
 
 
         return new JObject
@@ -74,13 +74,13 @@ public class EmailBuilder : IEmailMessageBuilder
                     {
                         new JObject
                         {
-                            ["Email"] = _emailInfo.To,
+                            ["Email"] = emailInfo.To,
                             ["Name"] = "User"
                         }
                     },
                     
-                    ["Subject"] = _emailInfo.Subject,
-                    ["TextPart"] = _emailInfo.Body + "\n" + _listing!.Url,
+                    ["Subject"] = emailInfo.Subject,
+                    ["TextPart"] = emailInfo.Body + "\n" + listing!.Url,
                 }
             }
         };

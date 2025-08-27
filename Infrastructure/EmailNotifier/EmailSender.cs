@@ -11,26 +11,26 @@ namespace Infrastructure.EmailNotifier;
 
 public class EmailSender : IEmailSender
 {
-    private readonly MailjetClient _mailjetClient;
-    private readonly IAsyncPolicy<Result> _retryPolicy;
+    private readonly MailjetClient mailjetClient;
+    private readonly IAsyncPolicy<Result> retryPolicy;
 
     public EmailSender(IOptions<MailjetSettings> mailjetOptions,
         IAsyncPolicy<Result> retryPolicy)
     {
         var mailjetSettings = mailjetOptions.Value;
-        _mailjetClient = new MailjetClient(mailjetSettings.ApiKey, mailjetSettings.SecretKey);
-        _retryPolicy = retryPolicy;
+        mailjetClient = new MailjetClient(mailjetSettings.ApiKey, mailjetSettings.SecretKey);
+        this.retryPolicy = retryPolicy;
     }
 
     public Task<Result> SendEmailAsync(JObject email, CancellationToken cancellationToken = default)
-        => _retryPolicy.ExecuteAsync(async _ =>
+        => retryPolicy.ExecuteAsync(async _ =>
         {
             var request = new MailjetRequest
             {
                 Resource = SendV31.Resource
             }.Property(Send.Messages, email["Messages"]);
 
-            var response = await _mailjetClient.PostAsync(request);
+            var response = await mailjetClient.PostAsync(request);
             
             Console.WriteLine($"StatusCode: {response.StatusCode}\n");
             Console.WriteLine($"ErrorInfo: {response.GetErrorInfo()}\n");
