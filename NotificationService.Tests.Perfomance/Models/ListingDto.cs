@@ -1,4 +1,4 @@
-namespace Application.Dtos;
+namespace NotificationService.Tests.Perfomance.Models;
 
 public class ListingDto
 {

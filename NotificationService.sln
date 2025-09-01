@@ -14,6 +14,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Persistence", "Persistence\Persistence.csproj", "{983BC5CF-B076-4D3F-A08B-1F7BE1F83B4B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService.Tests.Perfomance", "NotificationService.Tests.Perfomance\NotificationService.Tests.Perfomance.csproj", "{0DADEC26-35D9-48A2-AB5B-E1A6A80E5052}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,6 +42,10 @@ Global
 		{983BC5CF-B076-4D3F-A08B-1F7BE1F83B4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{983BC5CF-B076-4D3F-A08B-1F7BE1F83B4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{983BC5CF-B076-4D3F-A08B-1F7BE1F83B4B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0DADEC26-35D9-48A2-AB5B-E1A6A80E5052}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DADEC26-35D9-48A2-AB5B-E1A6A80E5052}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DADEC26-35D9-48A2-AB5B-E1A6A80E5052}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DADEC26-35D9-48A2-AB5B-E1A6A80E5052}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{871E2EC4-56AF-4C81-BD35-1D48459D2D34} = {7270C79F-D642-4AF1-B540-3748D77568EF}
