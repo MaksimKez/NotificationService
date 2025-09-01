@@ -2,11 +2,13 @@ using Application.Dtos;
 using Application.Results;
 using Application.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+[EnableRateLimiting("FixedPolicy")]
 public class ListingController(
     INotificationAggregator notificationAggregator)
     : ControllerBase

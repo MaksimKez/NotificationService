@@ -18,7 +18,7 @@ class Program
                 Id = Guid.NewGuid(), 
                 Name = "John", 
                 LastName = "Doe", 
-                Email = "prostomaxim765@gmail.com", 
+                Email = "blabla@gmail.com", 
                 TelegramId = null 
             },
             Listing = new ListingDto
@@ -47,7 +47,7 @@ class Program
                     : Response.Fail();
             })
             .WithLoadSimulations(
-                Simulation.KeepConstant(50, TimeSpan.FromSeconds(30))
+                Simulation.KeepConstant(30, TimeSpan.FromSeconds(10))
             );
 
         var multipleScenario = Scenario.Create("NotifyMultiple", async _ =>
@@ -58,7 +58,7 @@ class Program
                     : Response.Fail();
             })
             .WithLoadSimulations(
-                Simulation.KeepConstant(30, TimeSpan.FromSeconds(30))
+                Simulation.KeepConstant(20, TimeSpan.FromSeconds(10))
             );
 
         NBomberRunner

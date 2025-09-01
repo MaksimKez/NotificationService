@@ -9,7 +9,7 @@ using Polly;
 
 namespace Infrastructure.EmailNotifier;
 
-public class EmailSender
+public class EmailSender : IEmailSender
 {
     private readonly MailjetClient mailjetClient;
     private readonly IAsyncPolicy<Result> retryPolicy;

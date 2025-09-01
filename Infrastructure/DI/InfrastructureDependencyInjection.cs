@@ -38,7 +38,7 @@ public static class InfrastructureDependencyInjection
                 );
         });
 
-        services.AddScoped<IEmailSender, EmailSenderFake>();
+        services.AddScoped<IEmailSender, EmailSender>();
         
         services.AddScoped<INotifier, EmailNotifier.EmailNotifier>();
 
