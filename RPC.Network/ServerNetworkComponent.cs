@@ -1,0 +1,71 @@
+using System.Text.Json;
+using Microsoft.Extensions.Logging;
+using PRC.Models;
+using RPC.Contracts.Bases;
+using RPC.Contracts.Interfaces;
+
+namespace RPC.Network;
+
+public class ServerNetworkComponent : IServerNetworkComponent
+{
+    private readonly BaseServerNetwork _baseServerNetwork;
+    private readonly IOperationRegistry _operationRegistry;
+    private readonly ILogger<ServerNetworkComponent> _logger;
+
+    public ServerNetworkComponent(BaseServerNetwork baseServerNetwork, IOperationRegistry operationRegistry, ILogger<ServerNetworkComponent> logger)
+    {
+        _baseServerNetwork = baseServerNetwork;
+        _operationRegistry = operationRegistry;
+        _logger = logger;
+    }
+
+    public async Task SendAsync<TPacket>(UserClient client, TPacket packet) where TPacket : class
+    {
+        try
+        {
+            if (!client.IsConnected)
+            {
+                return;
+            }
+
+            var packetType = packet!.GetType();
+            int opId;
+            if (!_operationRegistry.TryGetOperationId(packetType, out opId))
+            {
+                _logger.LogWarning("No operation id mapped for response packet type {PacketType}. Using opId=0.", packetType.FullName);
+                opId = 0;
+            }
+
+            var json = JsonSerializer.Serialize(packet);
+            var requestId = Guid.NewGuid();
+            var data = TcpHostedService.BuildEnvelopeBytes(opId, requestId, json);
+            await client.EnqueueOutgoingAsync(data).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to send packet to client {ClientId}", client.Id);
+            throw;
+        }
+    }
+
+    public async Task BroadcastAsync<TPacket>(TPacket packet) where TPacket : class
+    {
+        var clients = _baseServerNetwork.GetAllClients().Where(c => c.IsConnected);
+        var tasks = clients.Select(client => SendAsync(client, packet));
+        await Task.WhenAll(tasks).ConfigureAwait(false);
+    }
+
+    public async Task SendToUserAsync<TPacket>(string userId, TPacket packet) where TPacket : class
+    {
+        var userClients = _baseServerNetwork.GetClientsByUserId(userId).Where(c => c.IsConnected);
+        var tasks = userClients.Select(client => SendAsync(client, packet));
+        await Task.WhenAll(tasks).ConfigureAwait(false);
+    }
+
+    private async Task SendToClientAsync(string clientId, string data)
+    {
+        throw new NotImplementedException("Use direct enqueueing to UserClient");
+        // Deprecated: replaced by direct enqueueing to UserClient; kept for compat if needed.
+        await Task.CompletedTask;
+    }
+}
