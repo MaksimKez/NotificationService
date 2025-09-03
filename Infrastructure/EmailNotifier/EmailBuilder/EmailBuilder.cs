@@ -58,7 +58,6 @@ public class EmailBuilder : IEmailMessageBuilder
         var fromEmail = !string.IsNullOrEmpty(emailInfo.FromEmail) ? emailInfo.FromEmail : _settings.FromEmail;
         var fromName = !string.IsNullOrEmpty(emailInfo.FromName) ? emailInfo.FromName : _settings.FromName;
 
-
         return new JObject
         {
             ["Messages"] = new JArray
@@ -67,8 +66,8 @@ public class EmailBuilder : IEmailMessageBuilder
                 {
                     ["From"] = new JObject
                     {
-                        ["Email"] = _settings.FromEmail,
-                        ["Name"] = _settings.FromName
+                        ["Email"] = fromEmail,
+                        ["Name"] = fromName
                     },
                     ["To"] = new JArray
                     {
@@ -80,7 +79,7 @@ public class EmailBuilder : IEmailMessageBuilder
                     },
                     
                     ["Subject"] = emailInfo.Subject,
-                    ["TextPart"] = emailInfo.Body + "\n" + listing!.Url,
+                    ["TextPart"] = emailInfo.Body + "\n" + listing?.Url,
                 }
             }
         };
@@ -94,6 +93,4 @@ public class EmailBuilder : IEmailMessageBuilder
             .WithListing(listing)
             .Build();
     }
-
-    // private string BuildHtmlBody()
 }
