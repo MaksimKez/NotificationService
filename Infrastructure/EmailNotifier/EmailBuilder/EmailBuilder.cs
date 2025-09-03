@@ -67,8 +67,8 @@ public class EmailBuilder : IEmailMessageBuilder
                 {
                     ["From"] = new JObject
                     {
-                        ["Email"] = _settings.FromEmail,
-                        ["Name"] = _settings.FromName
+                        ["Email"] = fromEmail,
+                        ["Name"] = fromName
                     },
                     ["To"] = new JArray
                     {
@@ -80,7 +80,7 @@ public class EmailBuilder : IEmailMessageBuilder
                     },
                     
                     ["Subject"] = emailInfo.Subject,
-                    ["TextPart"] = emailInfo.Body + "\n" + listing!.Url,
+                    ["TextPart"] = emailInfo.Body + "\n" + listing?.Url,
                 }
             }
         };

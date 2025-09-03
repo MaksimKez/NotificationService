@@ -15,6 +15,11 @@ public class NotificationAggregator
         return notificationStrategy.Notify(userListingPair, notifiers);
     }
 
+    public Task<Result> NotifySingle(EmailCodeDto emailCodeDto)
+    {
+        return notificationStrategy.Notify(emailCodeDto, notifiers);
+    }
+
     public async Task<Result> NotifyMultiple(UserListingPairDto[] userListingPairs)
     {
         foreach (var pair in userListingPairs)
