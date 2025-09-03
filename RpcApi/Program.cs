@@ -1,10 +1,9 @@
 using System.Reflection;
-using Application.Services;
-using Application.Services.Interfaces;
+using Application.DI;
+using Infrastructure.DI;
 using PRC.Models.Enums;
 using PRC.Models.Packets;
 using PRC.Models.Settings;
-using RPC.Contracts.Attributes;
 using RPC.Contracts.Bases;
 using RPC.Contracts.Interfaces;
 using RPC.Network;
@@ -25,7 +24,8 @@ builder.Services.AddHostedService<TcpHostedService>();
 
 builder.Services.AddRpcControllersFromAssemblies(Assembly.GetExecutingAssembly(), typeof(RpcNotificationController).Assembly);
 
-builder.Services.AddScoped<INotificationAggregator, NotificationAggregator>();
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure();
 
 builder.Services.AddSingleton(builder.Services);
 

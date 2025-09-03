@@ -10,9 +10,9 @@ public static class RpcAutoRegistrar
 {
     public static void RegisterRpcHandlers(IServiceProvider rootProvider)
     {
-        var packetProcessor = rootProvider.GetRequiredService<PacketProcessor>();
+        var packetProcessor = rootProvider.GetRequiredService<IPacketProcessor>();
         var operationRegistry = rootProvider.GetRequiredService<IOperationRegistry>();
-        var services = rootProvider.GetRequiredService<IServiceCollection>() ?? null;
+        var services = rootProvider.GetRequiredService<IServiceCollection>();
 
         var assemblies = AppDomain.CurrentDomain.GetAssemblies();
 
@@ -47,11 +47,10 @@ public static class RpcAutoRegistrar
                     Func<UserClient, object, Task> handler = async (client, packetObj) =>
                     {
                         using var scope = rootProvider.CreateScope();
+                        var controller = scope.ServiceProvider.GetService(type)
+                                                ?? ActivatorUtilities.CreateInstance(scope.ServiceProvider, type);
 
-                        var controller = scope.ServiceProvider.GetService(type) 
-                                         ?? ActivatorUtilities.CreateInstance(scope.ServiceProvider, type);
-
-                        var resultTask = (Task)mi.Invoke(controller, new[] { client, packetObj })!;
+                        var resultTask = (Task)mi.Invoke(controller, [client, packetObj])!;
                         await resultTask.ConfigureAwait(false);
                     };
 

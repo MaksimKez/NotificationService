@@ -1,21 +1,30 @@
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Channels;
+using Microsoft.Extensions.Logging;
 
 namespace PRC.Models;
 
-public class UserClient(TcpClient tcpClient) : IDisposable
+public class UserClient : IDisposable
 {
-    private readonly TcpClient _tcpClient = 
-        tcpClient ?? throw new ArgumentNullException(nameof(tcpClient));
-        
-    private readonly NetworkStream _stream = tcpClient.GetStream();
-    private readonly Channel<byte[]> _sendChannel 
-        = Channel.CreateUnbounded<byte[]>(new UnboundedChannelOptions { SingleReader = true, SingleWriter = false });
-        
+    private readonly TcpClient _tcpClient;
+    private readonly NetworkStream _stream;
+    private readonly Channel<byte[]> _sendChannel;
     private readonly CancellationTokenSource _cts = new();
-    public string Id { get; } = Guid.NewGuid().ToString("N");
+    private readonly ILogger<UserClient> _logger;
+
+    public string Id { get; }
+    public string? UserId { get; set; }
     public bool IsConnected => _tcpClient.Connected && !_cts.IsCancellationRequested;
+
+    public UserClient(TcpClient tcpClient, ILogger<UserClient> logger)
+    {
+        _tcpClient = tcpClient ?? throw new ArgumentNullException(nameof(tcpClient));
+        _stream = tcpClient.GetStream();
+        _sendChannel = Channel.CreateUnbounded<byte[]>(new UnboundedChannelOptions { SingleReader = true, SingleWriter = false });
+        _logger = logger;
+        Id = Guid.NewGuid().ToString("N");
+    }
 
     public async Task StartAsync(Func<UserClient, Task> receiveLoopStarter, CancellationToken cancellationToken)
     {
@@ -29,8 +38,7 @@ public class UserClient(TcpClient tcpClient) : IDisposable
     public ValueTask EnqueueOutgoingAsync(byte[] data)
     {
         return !_sendChannel.Writer.TryWrite(data)
-            // fallback to async write
-            ? _sendChannel.Writer.WriteAsync(data)
+            ? _sendChannel.Writer.WriteAsync(data) 
             : ValueTask.CompletedTask;
     }
 
@@ -50,6 +58,7 @@ public class UserClient(TcpClient tcpClient) : IDisposable
                     }
                     catch (Exception ex)
                     {
+                        _logger.LogWarning(ex, "Error writing to client {ClientId}", Id);
                         Cancel();
                         return;
                     }
@@ -59,9 +68,11 @@ public class UserClient(TcpClient tcpClient) : IDisposable
         catch (OperationCanceledException)
         {
             Cancel();
+            //just in case :)
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Unhandled send loop error for client {ClientId}", Id);
             Cancel();
         }
     }
@@ -103,7 +114,7 @@ public class UserClient(TcpClient tcpClient) : IDisposable
         }
     }
 
-    public void Cancel()
+    private void Cancel()
     {
         try { _cts.Cancel(false); } catch { }
         try { _tcpClient.Close(); } catch { }

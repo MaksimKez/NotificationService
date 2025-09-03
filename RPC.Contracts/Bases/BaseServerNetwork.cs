@@ -15,7 +15,8 @@ public class BaseServerNetwork
     {
         if (_connectedClients.Remove(clientId))
         {
-            
+            return;
+            //log
         }
 
         //for debug only

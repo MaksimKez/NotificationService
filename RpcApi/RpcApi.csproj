@@ -11,6 +11,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
       <ProjectReference Include="..\RPC.Contracts\RPC.Contracts.csproj" />
       <ProjectReference Include="..\RPC.Network\RPC.Network.csproj" />
     </ItemGroup>
