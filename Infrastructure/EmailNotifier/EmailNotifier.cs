@@ -18,6 +18,7 @@ public class EmailNotifier
 {
     public string Name { get; } = settings.Value.Name;
     public int Priority { get; } = settings.Value.Priority;
+    
     public async Task<Result> NotifySingle(UserListingPairDto userListingPair)
     {
         var emailMessage = messageBuilder.BuildDefault(userListingPair.Listing, userListingPair.User.Email
@@ -28,7 +29,11 @@ public class EmailNotifier
     public async Task<Result> NotifySingle(EmailCodeDto emailCodeDto)
     {
         var message = $"Code: {emailCodeDto.Token}";
-        var emailMessage = messageBuilder.WithMessage(message).WithSubject("Email verification").FromTo(null, null, emailCodeDto.ToEmail).Build();
+        var emailMessage = messageBuilder
+            .WithMessage(message)
+            .WithSubject("Email verification")
+            .FromTo(null, null, emailCodeDto.ToEmail)
+            .Build();
 
         return await SendMessage(emailMessage);
     }

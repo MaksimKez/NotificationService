@@ -25,5 +25,4 @@ public class VerificationController(
         !result.IsSuccess
             ? BadRequest(result.Error)
             : Ok();
-
 }

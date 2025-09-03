@@ -5,7 +5,6 @@ using Infrastructure.DI;
 using Infrastructure.EmailNotifier.Models;
 using Microsoft.AspNetCore.RateLimiting;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection(EmailSettings.DefaultConfigName));
@@ -57,6 +56,8 @@ app.UseHttpsRedirection();
 app.UseRateLimiter();
 
 app.UseAuthorization();
+
+app.UseRateLimiter();
 
 app.MapControllers();
 

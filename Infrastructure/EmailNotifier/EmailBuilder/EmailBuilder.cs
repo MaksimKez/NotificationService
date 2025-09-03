@@ -58,7 +58,6 @@ public class EmailBuilder : IEmailMessageBuilder
         var fromEmail = !string.IsNullOrEmpty(emailInfo.FromEmail) ? emailInfo.FromEmail : _settings.FromEmail;
         var fromName = !string.IsNullOrEmpty(emailInfo.FromName) ? emailInfo.FromName : _settings.FromName;
 
-
         return new JObject
         {
             ["Messages"] = new JArray

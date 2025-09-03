@@ -12,6 +12,8 @@ public interface INotifier
     Task<Result> NotifySingle(UserListingPairDto userListingPair);
     Task<Result> NotifySingle(EmailCodeDto emailCodeDto);
     
-    /// <returns>Result with dictionary, if succeed - dictionary is empty, if not - key is user's id that was not notified and the error why </returns>
+    /// <returns>
+    ///Result with dictionary, if succeed - dictionary is empty, if not - key is user's id that was not notified and the error why 
+    /// </returns>
     Task<ResultWithClass<Dictionary<Guid, string>>> NotifyMultiple(UserListingPairDto[] userListingPairs);
 }
