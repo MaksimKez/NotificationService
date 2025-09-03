@@ -42,6 +42,7 @@ opReg.Register((int)NotificationServerEnum.Result, typeof(ResultPacket));
 opReg.Register((int)NotificationServerEnum.NotifyMultiple, typeof(NotifyMultiplePacket));
 opReg.Register((int)NotificationServerEnum.NotifySingle, typeof(NotifySinglePacket));
 opReg.Register((int)NotificationServerEnum.SendVerificationCode, typeof(SendVerificationCodePacket));
+opReg.Register(1, typeof(PingPacket));
 
 app.MapControllers();
 

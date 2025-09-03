@@ -19,6 +19,7 @@ public class ServerNetworkComponent(
     {
         try
         {
+            logger.LogInformation("Sending RPC packet");
             if (!client.IsConnected)
             {
                 return;
@@ -33,8 +34,9 @@ public class ServerNetworkComponent(
             }
 
             var json = JsonSerializer.Serialize(packet);
-            var requestId = Guid.NewGuid(); // server-originated: new correlation id
+            var requestId = Guid.NewGuid();
             var data = TcpHostedService.BuildEnvelopeBytes(opId, requestId, json);
+            logger.LogInformation("data is formed");
             await client.EnqueueOutgoingAsync(data).ConfigureAwait(false);
         }
         catch (Exception ex)

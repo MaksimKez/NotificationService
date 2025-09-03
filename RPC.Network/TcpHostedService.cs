@@ -109,6 +109,7 @@ public class TcpHostedService : BackgroundService
         {
             while (!cancellationToken.IsCancellationRequested && userClient.IsConnected)
             {
+                Console.WriteLine($"{nameof(ReceiveLoopAsync)} is running for user: {userClient.UserId}");
                 (int opId, Guid requestId, string payload) envelope;
                 try
                 {

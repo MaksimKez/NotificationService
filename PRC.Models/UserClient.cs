@@ -46,14 +46,17 @@ public class UserClient : IDisposable
     {
         try
         {
+            _logger.LogInformation($"{nameof(SendLoopAsync)} is running for {Id}");
             var reader = _sendChannel.Reader;
             while (await reader.WaitToReadAsync(cancellationToken).ConfigureAwait(false))
             {
                 while (reader.TryRead(out var item))
                 {
+                    Console.WriteLine("Reader is waiting for item");
                     try
                     {
                         await _stream.WriteAsync(item, 0, item.Length, cancellationToken).ConfigureAwait(false);
+                        
                         await _stream.FlushAsync(cancellationToken).ConfigureAwait(false);
                     }
                     catch (Exception ex)
