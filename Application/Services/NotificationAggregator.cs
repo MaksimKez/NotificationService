@@ -10,21 +10,21 @@ public class NotificationAggregator
     INotificationStrategy notificationStrategy)
     : INotificationAggregator
 {   
-    public Task<Result> NotifySingle(UserListingPairDto userListingPair)
+    public Task<Result> NotifySingleAsync(UserListingPairDto userListingPair)
     {
         return notificationStrategy.Notify(userListingPair, notifiers);
     }
 
-    public Task<Result> NotifySingle(EmailCodeDto emailCodeDto)
+    public Task<Result> NotifySingleAsync(EmailCodeDto emailCodeDto)
     {
         return notificationStrategy.Notify(emailCodeDto, notifiers);
     }
 
-    public async Task<Result> NotifyMultiple(UserListingPairDto[] userListingPairs)
+    public async Task<Result> NotifyMultipleAsync(UserListingPairDto[] userListingPairs)
     {
         foreach (var pair in userListingPairs)
         {
-            var result = await NotifySingle(pair);
+            var result = await NotifySingleAsync(pair);
             if (!result.IsSuccess)
             {
                 return result;
