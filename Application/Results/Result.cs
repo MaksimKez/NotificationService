@@ -2,8 +2,8 @@ namespace Application.Results;
 
 public class Result
 {
-    public string Error { get; set; }
-    public bool IsSuccess { get; set; }
+    public string Error { get; private set; }
+    public bool IsSuccess { get; private protected set; }
 
     public static Result Success()
             => new Result { IsSuccess = true };

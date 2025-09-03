@@ -12,7 +12,7 @@ using Polly;
 
 namespace Infrastructure.DI;
 
-public static class InfrastructureDependencyInjection
+public static class InfrastructureServiceCollectionExtensions
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
