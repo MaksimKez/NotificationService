@@ -79,12 +79,10 @@ public class TcpHostedService : BackgroundService
             _baseServerNetwork.AddClient(userClient);
             _logger.LogInformation("New client connected {ClientId}", userClient.Id);
 
-            var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(serverCancellation);
-            var receiveLoopTask = Task.Run(() => ReceiveLoopAsync(userClient, linkedCts.Token), linkedCts.Token);
+            using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(serverCancellation);
 
-            await Task.CompletedTask;
-
-            await receiveLoopTask.ConfigureAwait(false);
+            await userClient.StartAsync(c
+                            => ReceiveLoopAsync(c, linkedCts.Token), linkedCts.Token).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
