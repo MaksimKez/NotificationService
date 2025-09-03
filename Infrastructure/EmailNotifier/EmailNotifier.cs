@@ -1,23 +1,27 @@
 using Application.Abstractions;
 using Application.Dtos;
+using Application.Dtos.Settings;
+using Application.Dtos.Settings.Contracts;
 using Application.Results;
 using Infrastructure.EmailNotifier.EmailBuilder.Interfaces;
 using Infrastructure.EmailNotifier.Interfaces;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 
 namespace Infrastructure.EmailNotifier;
 
 public class EmailNotifier
     (IEmailMessageBuilder messageBuilder, 
-     IEmailSender sender) 
+     IEmailSender sender,
+     IOptions<EmailNotifierSettings> settings) 
     : INotifier
 {
-    public string Name { get; } = "EmailNotifier";
-    public int Priority { get; } = 2;
+    public string Name { get; } = settings.Value.Name;
+    public int Priority { get; } = settings.Value.Priority;
     public async Task<Result> NotifySingle(UserListingPairDto userListingPair)
     {
         var emailMessage = messageBuilder.BuildDefault(userListingPair.Listing, userListingPair.User.Email
-                                                                                ?? throw new ArgumentException());
+                                                    ?? throw new ArgumentException(nameof(userListingPair.User.Email)));
         return await SendMessage(emailMessage);
     }
 

@@ -94,6 +94,4 @@ public class EmailBuilder : IEmailMessageBuilder
             .WithListing(listing)
             .Build();
     }
-
-    // private string BuildHtmlBody()
 }

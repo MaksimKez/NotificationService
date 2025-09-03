@@ -1,5 +1,7 @@
 using Application.Dtos;
+using Application.Dtos.Settings.Contracts;
 using Application.Results;
+using Microsoft.Extensions.Options;
 
 namespace Application.Abstractions;
 
