@@ -9,10 +9,12 @@ public class NotificationAggregator
     (IEnumerable<INotifier> notifiers,
     INotificationStrategy notificationStrategy)
     : INotificationAggregator
-{   
+{
+    private readonly IEnumerable<INotifier> _orderedNotifiers = notifiers.OrderBy(n => n.Priority).ToList();
+    
     public Task<Result> NotifySingleAsync(UserListingPairDto userListingPair)
     {
-        return notificationStrategy.Notify(userListingPair, notifiers);
+        return notificationStrategy.Notify(userListingPair, _orderedNotifiers);
     }
 
     public Task<Result> NotifySingleAsync(EmailCodeDto emailCodeDto)
