@@ -28,6 +28,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPC.Network", "RPC.Network\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RpcApi", "RpcApi\RpcApi.csproj", "{1EDA150C-8603-435F-B2DF-BEEF7364A90D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RpcClient", "RpcClient\RpcClient.csproj", "{C7FB0377-7D52-4F57-AF2B-6451AFF01782}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -74,6 +76,10 @@ Global
 		{1EDA150C-8603-435F-B2DF-BEEF7364A90D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1EDA150C-8603-435F-B2DF-BEEF7364A90D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1EDA150C-8603-435F-B2DF-BEEF7364A90D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C7FB0377-7D52-4F57-AF2B-6451AFF01782}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7FB0377-7D52-4F57-AF2B-6451AFF01782}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7FB0377-7D52-4F57-AF2B-6451AFF01782}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7FB0377-7D52-4F57-AF2B-6451AFF01782}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{871E2EC4-56AF-4C81-BD35-1D48459D2D34} = {7270C79F-D642-4AF1-B540-3748D77568EF}

@@ -1,8 +1,9 @@
+using Microsoft.Extensions.Logging;
 using PRC.Models;
 
 namespace RPC.Contracts.Bases;
 
-public class BaseServerNetwork
+public class BaseServerNetwork(ILogger<BaseServerNetwork> logger)
 {
     private readonly Dictionary<string, UserClient> _connectedClients = new();
     
@@ -15,8 +16,8 @@ public class BaseServerNetwork
     {
         if (_connectedClients.Remove(clientId))
         {
+            logger.LogInformation("Client disconnected {ClientId}", clientId);
             return;
-            //log
         }
 
         //for debug only

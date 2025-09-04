@@ -6,6 +6,7 @@ using PRC.Models;
 using RPC.Contracts.Attributes;
 using RPC.Contracts.Bases;
 using RPC.Contracts.Interfaces;
+using RPC.Network.Helpers;
 
 namespace RPC.Network;
 
@@ -19,6 +20,7 @@ public class ServerNetworkComponent(
     {
         try
         {
+            logger.LogInformation("Sending RPC packet");
             if (!client.IsConnected)
             {
                 return;
@@ -32,9 +34,13 @@ public class ServerNetworkComponent(
                 opId = 0;
             }
 
-            var json = JsonSerializer.Serialize(packet);
-            var requestId = Guid.NewGuid(); // server-originated: new correlation id
-            var data = TcpHostedService.BuildEnvelopeBytes(opId, requestId, json);
+                                    //i wanted to see smt new to make sure that
+                                    //the result packet is real, ill keep it as it is
+                                    //because it just "fun" part of the project
+            var json = JsonSerializer.Serialize(packet) + "\n some changes";
+            var requestId = Guid.NewGuid();
+            var data = EnvelopeBuilder.BuildEnvelopeBytes(opId, requestId, json);
+            logger.LogInformation("data is formed");
             await client.EnqueueOutgoingAsync(data).ConfigureAwait(false);
         }
         catch (Exception ex)

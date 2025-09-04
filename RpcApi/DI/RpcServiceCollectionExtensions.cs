@@ -5,7 +5,8 @@ namespace RpcApi.DI;
 
 public static class RpcServiceCollectionExtensions
 {
-    public static IServiceCollection AddRpcControllersFromAssemblies(this IServiceCollection services, params Assembly[]? assemblies)
+    public static IServiceCollection AddRpcControllersFromAssemblies(
+        this IServiceCollection services, params Assembly[]? assemblies)
         => services.AddRpcControllersFromAssemblies(_ => true, assemblies);
 
     private static IServiceCollection AddRpcControllersFromAssemblies(this IServiceCollection services, Func<Type, bool> typeFilter, params Assembly[]? assemblies)
@@ -28,8 +29,7 @@ public static class RpcServiceCollectionExtensions
                 types = ex.Types.Where(t => t != null).ToArray()!;
             }
             catch
-            {
-                // skip assemblies we cannot read
+            { 
                 continue;
             }
 
@@ -60,7 +60,6 @@ public static class RpcServiceCollectionExtensions
                 }
             }
         }
-
         return services;
     }
 }

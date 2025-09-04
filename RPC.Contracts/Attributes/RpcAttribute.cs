@@ -1,12 +1,7 @@
 namespace RPC.Contracts.Attributes;
 
 [AttributeUsage(AttributeTargets.Method)]
-public class RpcAttribute : Attribute
+public class RpcAttribute(int operationId) : Attribute
 {
-    public int OperationId { get; }
-
-    public RpcAttribute(int operationId)
-    {
-        OperationId = operationId;
-    }
+    public int OperationId { get; } = operationId;
 }

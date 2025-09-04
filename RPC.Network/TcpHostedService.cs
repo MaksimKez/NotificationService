@@ -10,16 +10,17 @@ using PRC.Models;
 using PRC.Models.Settings;
 using RPC.Contracts.Bases;
 using RPC.Contracts.Interfaces;
+using RPC.Network.Helpers;
 
 namespace RPC.Network;
 
 public class TcpHostedService : BackgroundService
 {
+    public IOperationRegistry OperationRegistry { get; }
     private readonly ILogger<TcpHostedService> _logger;
     private readonly IServiceProvider _serviceProvider;
     private readonly IPacketProcessor _packetProcessor;
     private readonly BaseServerNetwork _baseServerNetwork;
-    private readonly IOperationRegistry _operationRegistry;
     private readonly IPAddress _listenAddress;
     private readonly int _port;
 
@@ -33,15 +34,15 @@ public class TcpHostedService : BackgroundService
         ILogger<TcpHostedService> logger,
         IOptions<RpcSettings> options)
     {
+        OperationRegistry = operationRegistry;
         _serviceProvider = serviceProvider;
         _packetProcessor = packetProcessor;
         _baseServerNetwork = baseServerNetwork;
-        _operationRegistry = operationRegistry;
         _logger = logger;
 
-        var host = options.Value.Host ?? "0.0.0.0";
+        var host = options.Value.Host ?? "127.0.0.1";
         _listenAddress = IPAddress.Parse(host);
-        _port = options.Value.Port ?? 5000;
+        _port = options.Value.Port ?? 5005;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -79,12 +80,10 @@ public class TcpHostedService : BackgroundService
             _baseServerNetwork.AddClient(userClient);
             _logger.LogInformation("New client connected {ClientId}", userClient.Id);
 
-            var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(serverCancellation);
-            var receiveLoopTask = Task.Run(() => ReceiveLoopAsync(userClient, linkedCts.Token), linkedCts.Token);
+            using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(serverCancellation);
 
-            await Task.CompletedTask;
-
-            await receiveLoopTask.ConfigureAwait(false);
+            await userClient.StartAsync(c
+                            => ReceiveLoopAsync(c, linkedCts.Token), linkedCts.Token).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -96,9 +95,17 @@ public class TcpHostedService : BackgroundService
             {
                 if (userClient.UserId != null) _baseServerNetwork.RemoveClient(userClient.UserId);
             }
-            catch { }
+            catch
+            {
+                _logger.LogWarning("Failed to remove client {ClientId}", userClient.Id);
+            }
 
-            try { userClient.Dispose(); } catch { }
+            try { userClient.Dispose(); }
+            catch
+            {
+                _logger.LogWarning("Failed to dispose client {ClientId}", userClient.Id);
+            }
+
             _logger.LogInformation("Client disconnected {ClientId}", userClient.Id);
         }
     }
@@ -109,6 +116,7 @@ public class TcpHostedService : BackgroundService
         {
             while (!cancellationToken.IsCancellationRequested && userClient.IsConnected)
             {
+                Console.WriteLine($"{nameof(ReceiveLoopAsync)} is running for user: {userClient.UserId}");
                 (int opId, Guid requestId, string payload) envelope;
                 try
                 {
@@ -136,7 +144,7 @@ public class TcpHostedService : BackgroundService
 
                         var errorObj = new { IsSuccess = false, ErrorMessage = ex.Message, Correlation = envelope.requestId };
                         var json = JsonSerializer.Serialize(errorObj);
-                        var data = BuildEnvelopeBytes(0, envelope.requestId, json);
+                        var data = EnvelopeBuilder.BuildEnvelopeBytes(0, envelope.requestId, json);
                         try { await userClient.EnqueueOutgoingAsync(data); } catch { }
                     }
                 }, cancellationToken);
@@ -147,20 +155,5 @@ public class TcpHostedService : BackgroundService
         {
             _logger.LogError(ex, "Receive loop crashed for {ClientId}", userClient.Id);
         }
-    }
-
-    //(4) +opId (4) + requestId (16) + payload (utf8)
-    public static byte[] BuildEnvelopeBytes(int opId, Guid requestId, string jsonPayload)
-    {
-        var payloadBytes = Encoding.UTF8.GetBytes(jsonPayload);
-        var length = 4 + 16 + payloadBytes.Length;
-        var buffer = new byte[4 + length]; 
-
-        BitConverter.GetBytes(length).CopyTo(buffer, 0);
-        BitConverter.GetBytes(opId).CopyTo(buffer, 4);
-        requestId.ToByteArray().CopyTo(buffer, 8);
-        Array.Copy(payloadBytes, 0, buffer, 8 + 16, payloadBytes.Length);
-
-        return buffer;
     }
 }

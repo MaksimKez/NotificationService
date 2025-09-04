@@ -6,4 +6,4 @@ public class RpcRequest
     public string PacketData { get; set; } = null!;
     public DateTime Timestamp { get; set; }
     public string ClientId { get; set; } = null!;
-}
+}   

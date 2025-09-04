@@ -5,26 +5,16 @@ using Microsoft.Extensions.Logging;
 
 namespace PRC.Models;
 
-public class UserClient : IDisposable
+public class UserClient(TcpClient tcpClient, ILogger<UserClient> logger) : IDisposable
 {
-    private readonly TcpClient _tcpClient;
-    private readonly NetworkStream _stream;
-    private readonly Channel<byte[]> _sendChannel;
+    private readonly TcpClient _tcpClient = tcpClient ?? throw new ArgumentNullException(nameof(tcpClient));
+    private readonly NetworkStream _stream = tcpClient.GetStream();
+    private readonly Channel<byte[]> _sendChannel = Channel.CreateUnbounded<byte[]>(new UnboundedChannelOptions { SingleReader = true, SingleWriter = false });
     private readonly CancellationTokenSource _cts = new();
-    private readonly ILogger<UserClient> _logger;
 
-    public string Id { get; }
+    public string Id { get; } = Guid.NewGuid().ToString("N");
     public string? UserId { get; set; }
     public bool IsConnected => _tcpClient.Connected && !_cts.IsCancellationRequested;
-
-    public UserClient(TcpClient tcpClient, ILogger<UserClient> logger)
-    {
-        _tcpClient = tcpClient ?? throw new ArgumentNullException(nameof(tcpClient));
-        _stream = tcpClient.GetStream();
-        _sendChannel = Channel.CreateUnbounded<byte[]>(new UnboundedChannelOptions { SingleReader = true, SingleWriter = false });
-        _logger = logger;
-        Id = Guid.NewGuid().ToString("N");
-    }
 
     public async Task StartAsync(Func<UserClient, Task> receiveLoopStarter, CancellationToken cancellationToken)
     {
@@ -46,19 +36,22 @@ public class UserClient : IDisposable
     {
         try
         {
+            logger.LogInformation($"{nameof(SendLoopAsync)} is running for {Id}");
             var reader = _sendChannel.Reader;
             while (await reader.WaitToReadAsync(cancellationToken).ConfigureAwait(false))
             {
                 while (reader.TryRead(out var item))
                 {
+                    Console.WriteLine("Reader is waiting for item");
                     try
                     {
                         await _stream.WriteAsync(item, 0, item.Length, cancellationToken).ConfigureAwait(false);
+                        
                         await _stream.FlushAsync(cancellationToken).ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogWarning(ex, "Error writing to client {ClientId}", Id);
+                        logger.LogWarning(ex, "Error writing to client {ClientId}", Id);
                         Cancel();
                         return;
                     }
@@ -68,11 +61,11 @@ public class UserClient : IDisposable
         catch (OperationCanceledException)
         {
             Cancel();
-            //just in case :)
+            logger.LogInformation("Send loop cancelled for client {ClientId}", Id);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Unhandled send loop error for client {ClientId}", Id);
+            logger.LogError(ex, "Unhandled send loop error for client {ClientId}", Id);
             Cancel();
         }
     }
@@ -116,14 +109,37 @@ public class UserClient : IDisposable
 
     private void Cancel()
     {
-        try { _cts.Cancel(false); } catch { }
-        try { _tcpClient.Close(); } catch { }
+        try { _cts.Cancel(false); }
+        catch
+        {
+            logger.LogWarning("Failed to cancel client {ClientId}", Id);
+        }
+
+        try { _tcpClient.Close(); }
+        catch
+        {
+            logger.LogWarning("Failed to close client {ClientId}", Id);
+        }
     }
 
     public void Dispose()
     {
-        try { _cts.Cancel(); } catch { }
-        try { _stream.Dispose(); } catch { }
-        try { _tcpClient.Dispose(); } catch { }
+        try { _cts.Cancel(); }
+        catch
+        {
+            logger.LogWarning("Failed to cancel client {ClientId}", Id);
+        }
+
+        try { _stream.Dispose(); }
+        catch
+        {
+            logger.LogWarning("Failed to dispose stream for client {ClientId}", Id);
+        }
+
+        try { _tcpClient.Dispose(); }
+        catch
+        {
+            logger.LogWarning("Failed to dispose client {ClientId}", Id);
+        }
     }
 }
