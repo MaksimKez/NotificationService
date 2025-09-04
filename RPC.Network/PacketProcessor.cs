@@ -8,9 +8,6 @@ namespace RPC.Network;
 public class PacketProcessor(IOperationRegistry operationRegistry) : IPacketProcessor
 {
     private readonly ConcurrentDictionary<Type, Func<UserClient, object, Task>> _handlers = new();
-    private readonly IOperationRegistry _operationRegistry = operationRegistry
-                                                             ?? throw new ArgumentNullException(nameof(operationRegistry));
-    
     public void RegisterHandler<TPacket>(Func<UserClient, TPacket, Task> handler) where TPacket : class
     {
         _handlers[typeof(TPacket)] = async (client, packet) =>
@@ -39,7 +36,7 @@ public class PacketProcessor(IOperationRegistry operationRegistry) : IPacketProc
     
     public async Task ProcessRawPacketAsync(UserClient client, int operationId, Guid requestId, string packetData)
     {
-        if (!_operationRegistry.TryGetPacketType(operationId, out var packetType) || packetType == null)
+        if (!operationRegistry.TryGetPacketType(operationId, out var packetType) || packetType == null)
         {
             throw new InvalidOperationException($"No handler registered for operation id {operationId}");
         }

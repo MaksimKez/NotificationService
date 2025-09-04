@@ -6,6 +6,7 @@ using PRC.Models;
 using RPC.Contracts.Attributes;
 using RPC.Contracts.Bases;
 using RPC.Contracts.Interfaces;
+using RPC.Network.Helpers;
 
 namespace RPC.Network;
 
@@ -38,7 +39,7 @@ public class ServerNetworkComponent(
                                     //because it just "fun" part of the project
             var json = JsonSerializer.Serialize(packet) + "\n some changes";
             var requestId = Guid.NewGuid();
-            var data = TcpHostedService.BuildEnvelopeBytes(opId, requestId, json);
+            var data = EnvelopeBuilder.BuildEnvelopeBytes(opId, requestId, json);
             logger.LogInformation("data is formed");
             await client.EnqueueOutgoingAsync(data).ConfigureAwait(false);
         }

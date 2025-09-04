@@ -23,8 +23,6 @@ public static class RpcAutoRegistrar
 
             foreach (var type in types)
             {
-                if (type == null) continue;
-
                 var methods = type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
                 foreach (var mi in methods)
                 {

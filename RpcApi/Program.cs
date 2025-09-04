@@ -8,6 +8,7 @@ using RPC.Contracts.Bases;
 using RPC.Contracts.Interfaces;
 using RPC.Network;
 using RPC.Network.DiRelated;
+using RPC.Network.Helpers;
 using RpcApi.Controllers;
 using RpcApi.DI;
 
