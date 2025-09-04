@@ -33,7 +33,10 @@ public class ServerNetworkComponent(
                 opId = 0;
             }
 
-            var json = JsonSerializer.Serialize(packet);
+                                    //i wanted to see smt new to make sure that
+                                    //the result packet is real, ill keep it as it is
+                                    //because it just "fun" part of the project
+            var json = JsonSerializer.Serialize(packet) + "\n some changes";
             var requestId = Guid.NewGuid();
             var data = TcpHostedService.BuildEnvelopeBytes(opId, requestId, json);
             logger.LogInformation("data is formed");
