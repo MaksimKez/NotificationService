@@ -1,0 +1,69 @@
+using System.Reflection;
+using System.Text.Json;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using PRC.Models;
+using PRC.Models.Packets;
+using RPC.Contracts.Attributes;
+using RPC.Contracts.Bases;
+using RPC.Contracts.Interfaces;
+using RPC.Network.Helpers;
+
+namespace RPC.Network;
+
+public class ServerNetworkComponent(
+    BaseServerNetwork baseServerNetwork,
+    IOperationRegistry operationRegistry,
+    ILogger<ServerNetworkComponent> logger)
+    : IServerNetworkComponent
+{
+    public async Task SendAsync<TPacket>(UserClient client, TPacket packet) where TPacket : class
+    {
+        try
+        {
+            logger.LogInformation("Sending RPC packet");
+            if (!client.IsConnected)
+            {
+                return;
+            }
+
+            var packetType = packet.GetType();
+            if (!operationRegistry.TryGetOperationId(packetType, out var opId))
+            {
+                logger.LogWarning("No operation id mapped for response packet type {PacketType}. Using opId=0.", packetType.FullName);
+                opId = 0;
+            }
+
+            if (packet is PingPacket pingPacket)
+            {
+                pingPacket.Message = "some answer";
+            }
+
+            var json = JsonSerializer.Serialize(packet);
+            var requestId = Guid.NewGuid();
+            var data = EnvelopeBuilder.BuildEnvelopeBytes(opId, requestId, json);
+
+            logger.LogInformation("data is formed");
+            await client.EnqueueOutgoingAsync(data).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to send packet to client {ClientId}", client.Id);
+            throw;
+        }
+    }
+
+    public async Task BroadcastAsync<TPacket>(TPacket packet) where TPacket : class
+    {
+        var clients = baseServerNetwork.GetAllClients().Where(c => c.IsConnected);
+        var tasks = clients.Select(client => SendAsync(client, packet));
+        await Task.WhenAll(tasks).ConfigureAwait(false);
+    }
+
+    public async Task SendToUserAsync<TPacket>(string userId, TPacket packet) where TPacket : class
+    {
+        var userClients = baseServerNetwork.GetClientsByUserId(userId).Where(c => c.IsConnected);
+        var tasks = userClients.Select(client => SendAsync(client, packet));
+        await Task.WhenAll(tasks).ConfigureAwait(false);
+    }
+}
