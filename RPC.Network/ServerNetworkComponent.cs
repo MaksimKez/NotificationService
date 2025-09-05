@@ -3,6 +3,7 @@ using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PRC.Models;
+using PRC.Models.Packets;
 using RPC.Contracts.Attributes;
 using RPC.Contracts.Bases;
 using RPC.Contracts.Interfaces;
@@ -27,19 +28,21 @@ public class ServerNetworkComponent(
             }
 
             var packetType = packet.GetType();
-            int opId;
-            if (!operationRegistry.TryGetOperationId(packetType, out opId))
+            if (!operationRegistry.TryGetOperationId(packetType, out var opId))
             {
                 logger.LogWarning("No operation id mapped for response packet type {PacketType}. Using opId=0.", packetType.FullName);
                 opId = 0;
             }
 
-                                    //i wanted to see smt new to make sure that
-                                    //the result packet is real, ill keep it as it is
-                                    //because it just "fun" part of the project
-            var json = JsonSerializer.Serialize(packet) + "\n some changes";
+            if (packet is PingPacket pingPacket)
+            {
+                pingPacket.Message = "some answer";
+            }
+
+            var json = JsonSerializer.Serialize(packet);
             var requestId = Guid.NewGuid();
             var data = EnvelopeBuilder.BuildEnvelopeBytes(opId, requestId, json);
+
             logger.LogInformation("data is formed");
             await client.EnqueueOutgoingAsync(data).ConfigureAwait(false);
         }

@@ -40,7 +40,7 @@ class Program
         Array.Copy(payloadBytes, 0, buffer, 24, payloadBytes.Length);
 
         await stream.WriteAsync(buffer);
-        Console.WriteLine($"Sent PingPacket with requestId={requestId}");
+        Console.WriteLine($"Sent PingPacket with requestId={requestId}");   
 
         var lenBuf = new byte[4];
         await ReadExactAsync(stream, lenBuf);

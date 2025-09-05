@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
 using PRC.Models;
 
@@ -5,7 +6,7 @@ namespace RPC.Contracts.Bases;
 
 public class BaseServerNetwork(ILogger<BaseServerNetwork> logger)
 {
-    private readonly Dictionary<string, UserClient> _connectedClients = new();
+    private readonly ConcurrentDictionary<string, UserClient> _connectedClients = new();
     
     public void AddClient(UserClient client)
     {
@@ -14,14 +15,10 @@ public class BaseServerNetwork(ILogger<BaseServerNetwork> logger)
 
     public void RemoveClient(string clientId)
     {
-        if (_connectedClients.Remove(clientId))
-        {
-            logger.LogInformation("Client disconnected {ClientId}", clientId);
-            return;
-        }
-
-        //for debug only
-        throw new Exception();
+        if (!_connectedClients.TryRemove(clientId, out _))
+            throw new KeyNotFoundException($"Client with id {clientId} not found");
+        
+        logger.LogInformation("Client disconnected {ClientId}", clientId);
     }
 
     public UserClient? GetClient(string clientId)
@@ -36,6 +33,6 @@ public class BaseServerNetwork(ILogger<BaseServerNetwork> logger)
 
     public IEnumerable<UserClient> GetClientsByUserId(string userId)
     {
-        return _connectedClients.Values.Where(c => c.Id == userId);
+        return _connectedClients.Values.Where(c => c.UserId == userId);
     }
 }

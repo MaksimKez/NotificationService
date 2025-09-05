@@ -1,3 +1,4 @@
+using System.Buffers.Binary;
 using System.Text;
 
 namespace RPC.Network.Helpers;
@@ -15,12 +16,14 @@ public static class EnvelopeBuilder
     {
         var payloadBytes = Encoding.UTF8.GetBytes(jsonPayload);
         var length = 4 + 16 + payloadBytes.Length;
-        var buffer = new byte[4 + length]; 
+        var buffer = new byte[4 + length];
 
-        BitConverter.GetBytes(length).CopyTo(buffer, 0);
-        BitConverter.GetBytes(opId).CopyTo(buffer, 4);
-        requestId.ToByteArray().CopyTo(buffer, 8);
-        Array.Copy(payloadBytes, 0, buffer, 8 + 16, payloadBytes.Length);
+        BinaryPrimitives.WriteInt32BigEndian(buffer.AsSpan(0, 4), length);
+        BinaryPrimitives.WriteInt32BigEndian(buffer.AsSpan(4, 4), opId);
+
+        requestId.TryWriteBytes(buffer.AsSpan(8, 16));
+        
+        payloadBytes.CopyTo(buffer.AsSpan(24));
 
         return buffer;
     }
