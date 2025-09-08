@@ -29,12 +29,15 @@ jobs:
 
       - name: Run integration tests
         run: dotnet test --no-build --configuration Release --logger "trx;LogFileName=IntegrationTestResults.trx" --results-directory ./test-results --filter "Category=Integration"
-
+          
       - name: Publish test results
         if: always()
         uses: EnricoMi/publish-unit-test-result-action@v2
         with:
           files: test-results/**/*.trx
+          check_run: false
+          job_summary: true
+
 
       - name: Upload test results
         if: always()
