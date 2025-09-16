@@ -42,7 +42,7 @@ public class NotificationAggregatorTests
             .ReturnsAsync(expectedResult);
 
         // Act
-        var result = await _aggregator.NotifySingle(dto);
+        var result = await _aggregator.NotifySingleAsync(dto);
 
         // Assert
         result.Should().Be(expectedResult);
@@ -65,7 +65,7 @@ public class NotificationAggregatorTests
             .ReturnsAsync(Result.Success());
 
         // Act
-        var result = await _aggregator.NotifyMultiple(dtos);
+        var result = await _aggregator.NotifyMultipleAsync(dtos);
 
         // Assert
         result.IsSuccess.Should().BeFalse();
@@ -93,7 +93,7 @@ public class NotificationAggregatorTests
             .ReturnsAsync(Result.Success());
 
         // Act
-        var result = await _aggregator.NotifyMultiple(dtos);
+        var result = await _aggregator.NotifyMultipleAsync(dtos);
 
         // Assert
         result.IsSuccess.Should().BeTrue();

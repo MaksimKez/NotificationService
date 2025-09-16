@@ -1,8 +1,11 @@
 using Application.Dtos;
+using Application.Dtos.Settings;
 using Application.Results;
 using FluentAssertions;
 using Infrastructure.EmailNotifier.EmailBuilder.Interfaces;
 using Infrastructure.EmailNotifier.Interfaces;
+using Infrastructure.EmailNotifier.Models;
+using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json.Linq;
 
@@ -19,7 +22,8 @@ namespace Infrastructure.Tests.EmailNotifier
             _builderMock = new Mock<IEmailMessageBuilder>();
             _senderMock = new Mock<IEmailSender>();
 
-            _notifier = new Infrastructure.EmailNotifier.EmailNotifier(_builderMock.Object, _senderMock.Object);
+            var options = Options.Create(new EmailNotifierSettings());
+            _notifier = new Infrastructure.EmailNotifier.EmailNotifier(_builderMock.Object, _senderMock.Object, options);
         }
 
         private static UserListingPairDto CreateUserListingPair(Guid? userId = null, string? email = "test@test.com")

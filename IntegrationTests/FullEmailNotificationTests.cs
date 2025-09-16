@@ -1,4 +1,5 @@
 using Application.Dtos;
+using Application.Dtos.Settings;
 using Application.Results;
 using Application.Services;
 using Application.Services.Strategies;
@@ -18,26 +19,24 @@ namespace IntegrationTests
         [Fact]
         public async Task Should_Send_Email_Notification_Successfully()
         {
-            // Arrange: настройки email
+            // Arrange
             var settings = Options.Create(new EmailSettings
             {
                 FromEmail = "noreply@test.com",
                 FromName = "Notification Service"
             });
 
-            // мок отправщика
             var emailSenderMock = new Mock<IEmailSender>();
             emailSenderMock
                 .Setup(s => s.SendEmailAsync(It.IsAny<JObject>(), CancellationToken.None))
                 .ReturnsAsync(Result.Success());
 
-            // реальные компоненты
+            var options = Options.Create(new EmailNotifierSettings());
             var emailBuilder = new EmailBuilder(settings);
-            var emailNotifier = new EmailNotifier(emailBuilder, emailSenderMock.Object);
+            var emailNotifier = new EmailNotifier(emailBuilder, emailSenderMock.Object, options);
             var strategy = new FallbackNotificationStrategy();
             var aggregator = new NotificationAggregator(new[] { emailNotifier }, strategy);
 
-            // данные для пользователя и объявления
             var userListing = new UserListingPairDto
             {
                 User = new UserDto { Id = Guid.NewGuid(), Email = "user@test.com" },
@@ -45,7 +44,7 @@ namespace IntegrationTests
             };
 
             // Act
-            var result = await aggregator.NotifySingle(userListing);
+            var result = await aggregator.NotifySingleAsync(userListing);
 
             // Assert
             result.IsSuccess.Should().BeTrue();
