@@ -55,6 +55,10 @@ public class EmailBuilder : IEmailMessageBuilder
 
     public JObject Build()
     {
+        if (listing is null)
+        {
+            throw new NullReferenceException("Listing is null");
+        }
         var fromEmail = !string.IsNullOrEmpty(emailInfo.FromEmail) ? emailInfo.FromEmail : _settings.FromEmail;
         var fromName = !string.IsNullOrEmpty(emailInfo.FromName) ? emailInfo.FromName : _settings.FromName;
 
