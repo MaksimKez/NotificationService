@@ -13,4 +13,5 @@ public class ListingDto
     public bool HasAppliances { get; set; }
     public string Url { get; set; }
     public DateTime CreatedAt { get; set; }
+    public string ImageLink { get; set; }
 }

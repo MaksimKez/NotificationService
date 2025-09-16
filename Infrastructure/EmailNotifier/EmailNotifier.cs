@@ -1,26 +1,41 @@
 using Application.Abstractions;
 using Application.Dtos;
+using Application.Dtos.Settings;
+using Application.Dtos.Settings.Contracts;
 using Application.Results;
 using Infrastructure.EmailNotifier.EmailBuilder.Interfaces;
 using Infrastructure.EmailNotifier.Interfaces;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json.Linq;
 
 namespace Infrastructure.EmailNotifier;
 
 public class EmailNotifier
     (IEmailMessageBuilder messageBuilder, 
-     IEmailSender sender) 
+     IEmailSender sender,
+     IOptions<EmailNotifierSettings> settings) 
     : INotifier
 {
-    public string Name { get; } = "EmailNotifier";
-    public int Priority { get; } = 2;
+    public string Name { get; } = settings.Value.Name;
+    public int Priority { get; } = settings.Value.Priority;
+    
     public async Task<Result> NotifySingle(UserListingPairDto userListingPair)
     {
         var emailMessage = messageBuilder.BuildDefault(userListingPair.Listing, userListingPair.User.Email
-                                                                                ?? throw new ArgumentException());
-        var result = await sender.SendEmailAsync(emailMessage);
-        return !result.IsSuccess
-            ? result 
-            : Result.Success();
+                                                    ?? throw new ArgumentException(nameof(userListingPair.User.Email)));
+        return await SendMessage(emailMessage);
+    }
+
+    public async Task<Result> NotifySingle(EmailCodeDto emailCodeDto)
+    {
+        var message = $"Code: {emailCodeDto.Token}";
+        var emailMessage = messageBuilder
+            .WithMessage(message)
+            .WithSubject("Email verification")
+            .FromTo(null, null, emailCodeDto.ToEmail)
+            .Build();
+
+        return await SendMessage(emailMessage);
     }
 
     public async Task<ResultWithClass<Dictionary<Guid, string>>> NotifyMultiple(UserListingPairDto[] userListingPairs)
@@ -42,5 +57,13 @@ public class EmailNotifier
         return unnotifiedUsersWithErrors.Count != 0 
             ? ResultWithClass<Dictionary<Guid, string>>.PartialFailure(unnotifiedUsersWithErrors)
             : ResultWithClass<Dictionary<Guid, string>>.Success(new Dictionary<Guid, string>());
+    }
+
+    private async Task<Result> SendMessage(JObject emailMessage)
+    {
+        var result = await sender.SendEmailAsync(emailMessage);
+        return !result.IsSuccess
+            ? result 
+            : Result.Success();
     }
 }
