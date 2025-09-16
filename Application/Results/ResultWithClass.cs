@@ -3,7 +3,7 @@ namespace Application.Results;
 public class ResultWithClass<TClass> : Result
     where TClass : class
 {
-    public bool IsPartialFailure { get; set; }
+    public bool IsPartialFailure { get; init; }
     public TClass? Value { get; set; }
     
     public static ResultWithClass<TClass> Success(TClass value) 
