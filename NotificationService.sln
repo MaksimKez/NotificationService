@@ -1,4 +1,3 @@
-﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api", "Api\Api.csproj", "{58C7C917-2028-4D4B-B122-1CAE76A323C5}"
 EndProject
@@ -15,6 +14,17 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Persistence", "Persistence\Persistence.csproj", "{983BC5CF-B076-4D3F-A08B-1F7BE1F83B4B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService.Tests.Perfomance", "NotificationService.Tests.Perfomance\NotificationService.Tests.Perfomance.csproj", "{0DADEC26-35D9-48A2-AB5B-E1A6A80E5052}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application.Test", "Application.Test\Application.Test.csproj", "{07E0FAF9-9AD1-4558-8A24-1C849DCC553B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Tests", "Infrastructure.Tests\Infrastructure.Tests.csproj", "{5AF2D3BC-4507-4AEF-B2E4-B6F437FFB342}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationTests", "IntegrationTests\IntegrationTests.csproj", "{BC26FF4D-6DF9-4FE2-8448-794C4E25CC7C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BAAED29C-AD30-4117-A3DC-A4CA7CB80F3B}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -46,6 +56,18 @@ Global
 		{0DADEC26-35D9-48A2-AB5B-E1A6A80E5052}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0DADEC26-35D9-48A2-AB5B-E1A6A80E5052}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0DADEC26-35D9-48A2-AB5B-E1A6A80E5052}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07E0FAF9-9AD1-4558-8A24-1C849DCC553B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07E0FAF9-9AD1-4558-8A24-1C849DCC553B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07E0FAF9-9AD1-4558-8A24-1C849DCC553B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07E0FAF9-9AD1-4558-8A24-1C849DCC553B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5AF2D3BC-4507-4AEF-B2E4-B6F437FFB342}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5AF2D3BC-4507-4AEF-B2E4-B6F437FFB342}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5AF2D3BC-4507-4AEF-B2E4-B6F437FFB342}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5AF2D3BC-4507-4AEF-B2E4-B6F437FFB342}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC26FF4D-6DF9-4FE2-8448-794C4E25CC7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC26FF4D-6DF9-4FE2-8448-794C4E25CC7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC26FF4D-6DF9-4FE2-8448-794C4E25CC7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC26FF4D-6DF9-4FE2-8448-794C4E25CC7C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{871E2EC4-56AF-4C81-BD35-1D48459D2D34} = {7270C79F-D642-4AF1-B540-3748D77568EF}
