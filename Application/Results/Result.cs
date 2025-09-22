@@ -2,7 +2,7 @@ namespace Application.Results;
 
 public class Result
 {
-    public string Error { get; set; }
+    public string Error { get; init; }
     public bool IsSuccess { get; set; }
 
     public static Result Success()

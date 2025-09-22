@@ -14,8 +14,8 @@ public class EmailBuilderTests
     {
         _settings = new EmailSettings
         {
-            FromEmail = "default@test.com",
-            FromName = "Default Sender"
+            FromEmail = "custom@test.com",
+            FromName = "Custom Sender"
         };
     }
 
@@ -40,7 +40,7 @@ public class EmailBuilderTests
         result.Should().NotBeNull();
         var message = result["Messages"]![0]!;
 
-        message["From"]!["Email"]!.Value<string>().Should().Be(_settings.FromEmail); // используется из настроек
+        message["From"]!["Email"]!.Value<string>().Should().Be(_settings.FromEmail);
         message["From"]!["Name"]!.Value<string>().Should().Be(_settings.FromName);
         message["To"]![0]!["Email"]!.Value<string>().Should().Be("user@test.com");
         message["Subject"]!.Value<string>().Should().Be("Custom Subject");

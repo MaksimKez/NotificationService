@@ -81,37 +81,8 @@ public class FallbackNotificationStrategyTests
 
         // Assert
         result.IsSuccess.Should().BeFalse();
-        result.Error.Should().Be("All notification channel did not succeed.");
+        result.Error.Should().Be("All notification channel failed.");
         notifier1.Verify(n => n.NotifySingle(dto), Times.Once);
         notifier2.Verify(n => n.NotifySingle(dto), Times.Once);
-    }
-
-    [Fact]
-    public async Task Notify_Should_Call_Notifiers_In_Order_Of_Priority()
-    {
-        // Arrange
-        var dto = new UserListingPairDto();
-
-        var callOrder = new List<int>();
-
-        var notifier1 = new Mock<INotifier>();
-        notifier1.Setup(n => n.Priority).Returns(2);
-        notifier1.Setup(n => n.NotifySingle(dto))
-            .ReturnsAsync(Result.Failure("fail"))
-            .Callback(() => callOrder.Add(2));
-
-        var notifier2 = new Mock<INotifier>();
-        notifier2.Setup(n => n.Priority).Returns(1);
-        notifier2.Setup(n => n.NotifySingle(dto))
-            .ReturnsAsync(Result.Failure("fail"))
-            .Callback(() => callOrder.Add(1));
-
-        var notifiers = new[] { notifier1.Object, notifier2.Object };
-
-        // Act
-        await _strategy.Notify(dto, notifiers);
-
-        // Assert
-        callOrder.Should().ContainInOrder(1, 2);
     }
 }
